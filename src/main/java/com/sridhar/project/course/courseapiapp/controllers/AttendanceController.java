@@ -1,10 +1,11 @@
 package com.sridhar.project.course.courseapiapp.controllers;
 
+import com.sridhar.project.course.courseapiapp.DataModel.EmployeeDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 public class AttendanceController {
@@ -28,7 +29,7 @@ public class AttendanceController {
     }
 
     @DeleteMapping(value = "/api/delete/leave")
-    public HashMap<String, String> cancelLeave(@RequestBody EmployeeDto employeeLeave) {
+    public HashMap<String, String> cancelLeave(@RequestBody EmployeeDTO employeeLeave) {
         return service.cancelLeave(employeeLeave);
     }
 }
