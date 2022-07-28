@@ -92,10 +92,31 @@ public class AttendanceService {
     public HashMap<String, String> editEmployeeLeave(editEmployeeDTO employeeLeave){
         //business logic of the edit employee leave endpoint
         HashMap<String , String> editLeave = new HashMap<>();
+
         return editLeave;
     }
     public HashMap<String, String> cancelLeave(EmployeeDTO employeeLeave) {
         //business logic of cancel Leave endpoint
+        HashMap<String, String> cancelLeaveLog = new HashMap<>();
+
+        try{
+            Connection connect = connection.createConnectionUsingProps();
+            PreparedStatement statement = connect.prepareStatement("DELETE FROM Employee_Leaves.Leaves WHERE date = ? AND emp_id = ?");
+            statement.setString(1, employeeLeave.getDate());
+            statement.setString(2, employeeLeave.getEmployeeId());
+            int effectedRows = statement.executeUpdate();
+            if (effectedRows > 0){
+                cancelLeaveLog.put("Message", "Success");
+                cancelLeaveLog.put("Rows effected", Integer.toString(effectedRows));
+            }
+            connect.close();
+        }catch(Exception e){
+            cancelLeaveLog.put("Message", "error occured");
+            cancelLeaveLog.put("Error Message", e.getMessage());
+            e.printStackTrace();
+        }
+
+        return cancelLeaveLog;
     }
 
 }
