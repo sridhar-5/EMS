@@ -1,6 +1,7 @@
 package com.sridhar.project.course.courseapiapp.controllers;
 
 import com.sridhar.project.course.courseapiapp.DataModel.EmployeeDTO;
+import com.sridhar.project.course.courseapiapp.DataModel.editEmployeeDTO;
 import com.sridhar.project.course.courseapiapp.service.ConnectionService;
 import groovy.util.logging.Log;
 import groovy.util.logging.Slf4j;
@@ -13,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,29 +36,66 @@ public class AttendanceService {
             //establishing connection
             Connection conn = connection.createConnectionUsingProps();
             //preparing the query
-            PreparedStatement prepareQuery = conn.prepareStatement("Select * from Employee_Leaves where emp_id = ?");
-            prepareQuery.setString(1, "19063");
+            PreparedStatement prepareQuery = conn.prepareStatement("Select * from Employees where emp_id = ?");
+            prepareQuery.setString(1, employeeId);
             //execute and store results in result set
             ResultSet resultSet = prepareQuery.executeQuery();
             //process the results
+            while(resultSet.next()){
+                HashMap<String, String> currentLeave = new HashMap<>();
+                currentLeave.put("date_applied", new Date(Long.parseLong(resultSet.getString("__createdtime__"))).toString());
+                currentLeave.put("last_updated_date", new Date(Long.parseLong(resultSet.getString("__updatedtime__"))).toString());
+                currentLeave.put("leave_applied_for", resultSet.getString("Date"));
+                currentLeave.put("employee_id", resultSet.getString("emp_id"));
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+                //adding the current employee instance to the list of the leaves
+                resultList.add(currentLeave);
+            }
+
+            //closing the connection
+            conn.close();
+        } catch (Exception e) {
+            HashMap<String, String> errorRes = new HashMap<>();
+            errorRes.put("error", e.getMessage());
+            resultList.add(errorRes);
+            e.printStackTrace();
         }
-
+        return resultList;
     }
 
     public HashMap<String, String> addNewLeave(EmployeeDTO employeeLeave){
         //business logic of the ass new leaves endpoint
+        HashMap<String, String> newLeave = new HashMap<>();
+        try{
+            Connection connect = connection.createConnectionUsingProps();
+            PreparedStatement statement = connect.prepareStatement("insert into Employee_Leaves.Leaves (date, emp_id) values (? , ?)");
+            statement.setString(1, employeeLeave.getDate());
+            statement.setString(2, employeeLeave.getEmployeeId());
+
+            //result is no of rows effected in the database
+            int effectedRows = statement.executeUpdate();
+            if (effectedRows > 1){
+                //query success
+                newLeave.put("Message", "Insertion Successful");
+                newLeave.put("Rows effected", Integer.toString(effectedRows));
+            }
+            connect.close();
+        }catch (Exception e){
+            newLeave.put("Message", "Insertion failed");
+            newLeave.put("error Message", e.getMessage());
+            e.printStackTrace();
+        }
+        //close the connection to the database
+        return newLeave;
     }
 
-    public HashMap<String, String> editEmployeeLeave(EmployeeDTO employeeLeave){
+    public HashMap<String, String> editEmployeeLeave(editEmployeeDTO employeeLeave){
         //business logic of the edit employee leave endpoint
+        HashMap<String , String> editLeave = new HashMap<>();
+        return editLeave;
     }
-
     public HashMap<String, String> cancelLeave(EmployeeDTO employeeLeave) {
         //business logic of cancel Leave endpoint
-
     }
 
 }
