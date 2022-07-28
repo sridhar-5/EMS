@@ -92,9 +92,18 @@ public class AttendanceService {
     public HashMap<String, String> editEmployeeLeave(editEmployeeDTO employeeLeave){
         //business logic of the edit employee leave endpoint
         HashMap<String , String> editLeave = new HashMap<>();
+        try{
+            //start connection
+            Connection connect = connection.createConnectionUsingProps();
+            PreparedStatement prepareSt = connect.prepareStatement("UPDATE Employee_Leaves.Leaves SET date = ? WHERE emp_id = ? ");
 
+        }catch(Exception e){
+            editLeave.put("Message", "Error occured");
+            editLeave.put("Error Message", e.getMessage());
+        }
         return editLeave;
     }
+
     public HashMap<String, String> cancelLeave(EmployeeDTO employeeLeave) {
         //business logic of cancel Leave endpoint
         HashMap<String, String> cancelLeaveLog = new HashMap<>();
@@ -118,5 +127,4 @@ public class AttendanceService {
 
         return cancelLeaveLog;
     }
-
 }
