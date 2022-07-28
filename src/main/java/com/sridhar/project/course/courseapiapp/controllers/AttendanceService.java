@@ -95,8 +95,16 @@ public class AttendanceService {
         try{
             //start connection
             Connection connect = connection.createConnectionUsingProps();
-            PreparedStatement prepareSt = connect.prepareStatement("UPDATE Employee_Leaves.Leaves SET date = ? WHERE emp_id = ? ");
-
+            PreparedStatement prepareSt = connect.prepareStatement("UPDATE Employee_Leaves.Leaves SET date = ? WHERE emp_id = ? AND date = ?");
+            prepareSt.setString(1, employeeLeave.getEditedDate());
+            prepareSt.setString(2, Integer.toString(employeeLeave.getEmployeeId()));
+            prepareSt.setString(3, employeeLeave.getPreviousDate());
+            int effectedRows = prepareSt.executeUpdate();
+            if (effectedRows > 0){
+                editLeave.put("Message", "Success");
+                editLeave.put("count", Integer.toString(effectedRows));
+            }
+            connect.close();
         }catch(Exception e){
             editLeave.put("Message", "Error occured");
             editLeave.put("Error Message", e.getMessage());
